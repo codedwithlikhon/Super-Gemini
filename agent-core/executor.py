@@ -48,18 +48,13 @@ class Executor:
 
         for task in plan:
             action = task.get("action")
-            params = task.get("params", {})
 
-            print(f"--- Executing action: {action} ---")
-
+            # This logic assumes the old plan format for now.
+            # It will be upgraded in a future step to handle the new tool-based format.
             if action == "execute_script":
-                self.execute_script(params.get("script"))
+                self.execute_script(task.get("script"))
             elif action == "execute_in_ubuntu":
-                ubuntu_manager.execute_in_ubuntu(params.get("command"))
-            elif "." in action:
-                # This is a placeholder for tool execution, e.g., "fs.write"
-                tool_name, tool_action = action.split('.', 1)
-                print(f"INFO: Would execute tool '{tool_name}' (action: {tool_action}) with params: {params}")
+                ubuntu_manager.execute_in_ubuntu(task.get("command"))
             else:
                 print(f"⚠️ Unknown action type: {action}")
 

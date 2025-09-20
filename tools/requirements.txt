@@ -3,6 +3,3 @@ fastapi
 uvicorn
 pydantic
 llama-cpp-python
-
-# Dependency for Google Gemini API
-google-generativeai

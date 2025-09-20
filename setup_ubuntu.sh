@@ -18,9 +18,7 @@ proot-distro install ubuntu
 echo "✅ Ubuntu installation complete."
 
 # 3. Install essential development tools inside the new Ubuntu environment
-# We use 'proot-distro exec' to run commands as root within the Ubuntu guest.
-# The '--' separates the proot-distro options from the command to be executed.
-echo "[3/3] Installing development tools inside Ubuntu (git, python, node, etc.)..."
+echo "[3/3] Installing development tools inside Ubuntu..."
 proot-distro exec ubuntu -- /bin/bash -c ' \
     apt-get update && \
     apt-get install -y build-essential git python3 python3-pip nodejs npm sqlite3 \
