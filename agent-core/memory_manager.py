@@ -34,15 +34,9 @@ class MemoryManager:
         """
         Updates user preferences in preferences.json.
         """
-        print(f"Updating preferences with: {new_prefs}")
-
-        # Ensure the directory exists
         os.makedirs(os.path.dirname(self.preferences_file), exist_ok=True)
-
         current_prefs = self.get_preferences()
         current_prefs.update(new_prefs)
-
         with open(self.preferences_file, 'w') as f:
             json.dump(current_prefs, f, indent=4)
-
         print("Preferences updated successfully.")

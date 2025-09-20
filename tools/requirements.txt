@@ -1,4 +1,3 @@
-# Dependencies for the Native Python-based Model Runner
 fastapi
 uvicorn
 pydantic

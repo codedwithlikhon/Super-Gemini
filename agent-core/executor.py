@@ -1,7 +1,6 @@
 import subprocess
 import importlib
 
-# Dynamically import the ubuntu_manager
 ubuntu_manager_module = importlib.import_module("agent-core.ubuntu_manager")
 ubuntu_manager = ubuntu_manager_module
 
@@ -14,7 +13,6 @@ class Executor:
         Executes a script based on its file extension.
         """
         print(f"Executing script: {script_path}")
-
         try:
             if script_path.endswith(".sh"):
                 result = subprocess.run(["bash", script_path], capture_output=True, text=True, check=True)
@@ -25,15 +23,7 @@ class Executor:
             else:
                 print(f"Unsupported script type: {script_path}")
                 return
-
-            print(f"Output of {script_path}:")
-            print(result.stdout)
-
-        except FileNotFoundError:
-            print(f"Error: The runtime for the script '{script_path}' was not found.")
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing {script_path}:")
-            print(e.stderr)
+            print(f"Output of {script_path}:\n{result.stdout}")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
 
@@ -42,20 +32,12 @@ class Executor:
         Executes a plan from the Planner by dispatching tasks based on their action type.
         """
         print("Executing plan...")
-        if not plan:
-            print("Plan is empty. Nothing to execute.")
-            return
-
         for task in plan:
             action = task.get("action")
-
-            # This logic assumes the old plan format for now.
-            # It will be upgraded in a future step to handle the new tool-based format.
             if action == "execute_script":
                 self.execute_script(task.get("script"))
             elif action == "execute_in_ubuntu":
                 ubuntu_manager.execute_in_ubuntu(task.get("command"))
             else:
                 print(f"⚠️ Unknown action type: {action}")
-
         print("--- Plan execution finished. ---")
