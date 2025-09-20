@@ -12,7 +12,7 @@ def main():
     agent = Agent()
 
     # 2. Define a user request
-    user_request = "Create a file named 'plan_test.txt' in the root directory, write a friendly greeting into it, and then list the files in the current directory to confirm it was created."
+    user_request = "Create a new file named 'diary.txt' and write 'Today was a good day.' into it, then read the file back to confirm the content."
 
     # 3. Run the agent
     agent.run(user_request)

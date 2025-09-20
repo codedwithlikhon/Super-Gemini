@@ -89,20 +89,22 @@ Example Response:
         if not self.model:
             # Return a dummy plan if the API key is not configured
             print("INFO: Using dummy plan because Gemini API key is not set.")
+            # This dummy plan simulates the expected output for the test case:
+            # "Create a file named 'diary.txt', write to it, and read it back."
             return json.loads("""
             {
               "plan": [
                 {
                   "action": "fs.write",
                   "params": {
-                    "path": "test.txt",
-                    "content": "This is a dummy plan from the planner."
+                    "path": "diary.txt",
+                    "content": "Today was a good day."
                   }
                 },
                 {
-                  "action": "execute_in_ubuntu",
+                  "action": "fs.read",
                   "params": {
-                    "command": "echo 'Hello from the dummy plan!'"
+                    "path": "diary.txt"
                   }
                 }
               ]

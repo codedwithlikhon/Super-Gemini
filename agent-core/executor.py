@@ -57,9 +57,22 @@ class Executor:
             elif action == "execute_in_ubuntu":
                 ubuntu_manager.execute_in_ubuntu(params.get("command"))
             elif "." in action:
-                # This is a placeholder for tool execution, e.g., "fs.write"
-                tool_name, tool_action = action.split('.', 1)
-                print(f"INFO: Would execute tool '{tool_name}' (action: {tool_action}) with params: {params}")
+                # This is a dynamic tool call, e.g., "fs.write"
+                try:
+                    tool_name, function_name = action.split('.', 1)
+                    tool_module = importlib.import_module(f"tools.{tool_name}")
+                    tool_function = getattr(tool_module, function_name)
+
+                    # Execute the tool function with the provided parameters
+                    result = tool_function(**params)
+                    print(f"Tool {action} executed successfully. Result: {result}")
+
+                except ImportError:
+                    print(f"❌ Error: Tool '{tool_name}' not found.")
+                except AttributeError:
+                    print(f"❌ Error: Function '{function_name}' not found in tool '{tool_name}'.")
+                except Exception as e:
+                    print(f"❌ Error executing tool {action}: {e}")
             else:
                 print(f"⚠️ Unknown action type: {action}")
 
