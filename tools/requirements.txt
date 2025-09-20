@@ -1,0 +1,5 @@
+# Dependencies for the Native Python-based Model Runner
+fastapi
+uvicorn
+pydantic
+llama-cpp-python
