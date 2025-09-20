@@ -1,8 +1,13 @@
 import subprocess
+import importlib
+
+# Dynamically import the ubuntu_manager
+ubuntu_manager_module = importlib.import_module("agent-core.ubuntu_manager")
+ubuntu_manager = ubuntu_manager_module
 
 class Executor:
     """
-    Executes scripts in bash, Python, or Node.js.
+    Executes scripts in bash, Python, or Node.js, and commands inside the Ubuntu environment.
     """
     def execute_script(self, script_path: str):
         """
@@ -34,10 +39,28 @@ class Executor:
 
     def run_plan(self, plan: list):
         """
-        Executes a plan from the Planner.
+        Executes a plan from the Planner by dispatching tasks based on their action type.
         """
         print("Executing plan...")
+        if not plan:
+            print("Plan is empty. Nothing to execute.")
+            return
+
         for task in plan:
-            if task["action"] == "execute_script":
-                self.execute_script(task["script"])
-        print("Plan execution finished.")
+            action = task.get("action")
+            params = task.get("params", {})
+
+            print(f"--- Executing action: {action} ---")
+
+            if action == "execute_script":
+                self.execute_script(params.get("script"))
+            elif action == "execute_in_ubuntu":
+                ubuntu_manager.execute_in_ubuntu(params.get("command"))
+            elif "." in action:
+                # This is a placeholder for tool execution, e.g., "fs.write"
+                tool_name, tool_action = action.split('.', 1)
+                print(f"INFO: Would execute tool '{tool_name}' (action: {tool_action}) with params: {params}")
+            else:
+                print(f"⚠️ Unknown action type: {action}")
+
+        print("--- Plan execution finished. ---")
