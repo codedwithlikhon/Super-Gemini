@@ -8,13 +8,8 @@ def main():
     """
     Main function to run the Super-Gemini agent.
     """
-    # 1. Instantiate the Agent
     agent = Agent()
-
-    # 2. Define a user request
-    user_request = "Run the hello-world scripts for all supported languages and log the result."
-
-    # 3. Run the agent
+    user_request = "Run the hello-world scripts for all supported languages."
     agent.run(user_request)
 
 if __name__ == "__main__":

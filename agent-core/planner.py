@@ -13,7 +13,8 @@ class Planner:
         # Dummy plan for now
         plan = [
             {"action": "execute_script", "script": "test_scripts/hello.sh"},
-            {"action": "execute_in_ubuntu", "command": "echo 'Hello from inside Ubuntu!'"},
+            {"action": "execute_script", "script": "test_scripts/hello.py"},
+            {"action": "execute_script", "script": "test_scripts/hello.js"},
         ]
 
         print("Plan created successfully.")
