@@ -1,7 +1,5 @@
 # Super-Gemini
 
-# Super-Gemini
-
 Super-Gemini is a **local-first, agentic AI system** designed to run on Android and act as a **universal developer + productivity agent**.  
 It can execute tasks, scaffold full-stack web applications, and perform automation using a multi-runtime environment.
 
