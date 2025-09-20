@@ -1,4 +1,5 @@
 import json
+import os
 
 class MemoryManager:
     """
@@ -28,3 +29,20 @@ class MemoryManager:
         # In a real implementation, this would involve embedding the query
         # and performing a similarity search in the vector store.
         return [{"text": "dummy result from vector store"}]
+
+    def update_preferences(self, new_prefs: dict):
+        """
+        Updates user preferences in preferences.json.
+        """
+        print(f"Updating preferences with: {new_prefs}")
+
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(self.preferences_file), exist_ok=True)
+
+        current_prefs = self.get_preferences()
+        current_prefs.update(new_prefs)
+
+        with open(self.preferences_file, 'w') as f:
+            json.dump(current_prefs, f, indent=4)
+
+        print("Preferences updated successfully.")
