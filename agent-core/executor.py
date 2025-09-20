@@ -1,15 +1,18 @@
 import subprocess
+import importlib
+
+ubuntu_manager_module = importlib.import_module("agent-core.ubuntu_manager")
+ubuntu_manager = ubuntu_manager_module
 
 class Executor:
     """
-    Executes scripts in bash, Python, or Node.js.
+    Executes scripts in bash, Python, or Node.js, and commands inside the Ubuntu environment.
     """
     def execute_script(self, script_path: str):
         """
         Executes a script based on its file extension.
         """
         print(f"Executing script: {script_path}")
-
         try:
             if script_path.endswith(".sh"):
                 result = subprocess.run(["bash", script_path], capture_output=True, text=True, check=True)
@@ -20,24 +23,21 @@ class Executor:
             else:
                 print(f"Unsupported script type: {script_path}")
                 return
-
-            print(f"Output of {script_path}:")
-            print(result.stdout)
-
-        except FileNotFoundError:
-            print(f"Error: The runtime for the script '{script_path}' was not found.")
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing {script_path}:")
-            print(e.stderr)
+            print(f"Output of {script_path}:\n{result.stdout}")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
 
     def run_plan(self, plan: list):
         """
-        Executes a plan from the Planner.
+        Executes a plan from the Planner by dispatching tasks based on their action type.
         """
         print("Executing plan...")
         for task in plan:
-            if task["action"] == "execute_script":
-                self.execute_script(task["script"])
-        print("Plan execution finished.")
+            action = task.get("action")
+            if action == "execute_script":
+                self.execute_script(task.get("script"))
+            elif action == "execute_in_ubuntu":
+                ubuntu_manager.execute_in_ubuntu(task.get("command"))
+            else:
+                print(f"⚠️ Unknown action type: {action}")
+        print("--- Plan execution finished. ---")

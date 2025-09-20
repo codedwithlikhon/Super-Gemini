@@ -4,10 +4,12 @@ import importlib
 planner_module = importlib.import_module("agent-core.planner")
 executor_module = importlib.import_module("agent-core.executor")
 memory_manager_module = importlib.import_module("agent-core.memory_manager")
+ubuntu_manager_module = importlib.import_module("agent-core.ubuntu_manager")
 
 Planner = planner_module.Planner
 Executor = executor_module.Executor
 MemoryManager = memory_manager_module.MemoryManager
+ubuntu_manager = ubuntu_manager_module
 
 class Agent:
     """
@@ -17,6 +19,13 @@ class Agent:
         self.planner = Planner()
         self.executor = Executor()
         self.memory = MemoryManager()
+        self.ubuntu_installed = ubuntu_manager.is_ubuntu_installed()
+
+        if self.ubuntu_installed:
+            print("✅ Ubuntu environment detected.")
+        else:
+            print("⚠️ Ubuntu environment not found.")
+
         print("Agent initialized successfully.")
 
     def run(self, user_request: str):
