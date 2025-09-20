@@ -15,6 +15,10 @@ class Planner:
             {"action": "execute_script", "script": "test_scripts/hello.sh"},
             {"action": "execute_script", "script": "test_scripts/hello.py"},
             {"action": "execute_script", "script": "test_scripts/hello.js"},
+            {
+                "action": "execute_in_ubuntu",
+                "command": "echo 'Hello from inside the Ubuntu container!' && cat /etc/os-release"
+            },
         ]
 
         print("Plan created successfully.")

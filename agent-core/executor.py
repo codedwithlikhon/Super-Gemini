@@ -1,8 +1,13 @@
 import subprocess
+import importlib
+
+# Dynamically import the ubuntu_manager
+ubuntu_manager_module = importlib.import_module("agent-core.ubuntu_manager")
+ubuntu_manager = ubuntu_manager_module
 
 class Executor:
     """
-    Executes scripts in bash, Python, or Node.js.
+    Executes scripts in bash, Python, or Node.js, and commands inside the Ubuntu environment.
     """
     def execute_script(self, script_path: str):
         """
@@ -38,6 +43,11 @@ class Executor:
         """
         print("Executing plan...")
         for task in plan:
-            if task["action"] == "execute_script":
-                self.execute_script(task["script"])
+            action = task.get("action")
+            if action == "execute_script":
+                self.execute_script(task.get("script"))
+            elif action == "execute_in_ubuntu":
+                ubuntu_manager.execute_in_ubuntu(task.get("command"))
+            else:
+                print(f"Unknown action type: {action}")
         print("Plan execution finished.")
