@@ -12,7 +12,7 @@ def main():
     agent = Agent()
 
     # 2. Define a user request
-    user_request = "Create a new file named 'diary.txt' and write 'Today was a good day.' into it, then read the file back to confirm the content."
+    user_request = "Run the hello-world scripts for all supported languages and log the result."
 
     # 3. Run the agent
     agent.run(user_request)

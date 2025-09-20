@@ -1,13 +1,8 @@
 import subprocess
-import importlib
-
-# Dynamically import the ubuntu_manager
-ubuntu_manager_module = importlib.import_module("agent-core.ubuntu_manager")
-ubuntu_manager = ubuntu_manager_module
 
 class Executor:
     """
-    Executes scripts in bash, Python, or Node.js, and commands inside the Ubuntu environment.
+    Executes scripts in bash, Python, or Node.js.
     """
     def execute_script(self, script_path: str):
         """
@@ -39,41 +34,10 @@ class Executor:
 
     def run_plan(self, plan: list):
         """
-        Executes a plan from the Planner by dispatching tasks based on their action type.
+        Executes a plan from the Planner.
         """
         print("Executing plan...")
-        if not plan:
-            print("Plan is empty. Nothing to execute.")
-            return
-
         for task in plan:
-            action = task.get("action")
-            params = task.get("params", {})
-
-            print(f"--- Executing action: {action} ---")
-
-            if action == "execute_script":
-                self.execute_script(params.get("script"))
-            elif action == "execute_in_ubuntu":
-                ubuntu_manager.execute_in_ubuntu(params.get("command"))
-            elif "." in action:
-                # This is a dynamic tool call, e.g., "fs.write"
-                try:
-                    tool_name, function_name = action.split('.', 1)
-                    tool_module = importlib.import_module(f"tools.{tool_name}")
-                    tool_function = getattr(tool_module, function_name)
-
-                    # Execute the tool function with the provided parameters
-                    result = tool_function(**params)
-                    print(f"Tool {action} executed successfully. Result: {result}")
-
-                except ImportError:
-                    print(f"❌ Error: Tool '{tool_name}' not found.")
-                except AttributeError:
-                    print(f"❌ Error: Function '{function_name}' not found in tool '{tool_name}'.")
-                except Exception as e:
-                    print(f"❌ Error executing tool {action}: {e}")
-            else:
-                print(f"⚠️ Unknown action type: {action}")
-
-        print("--- Plan execution finished. ---")
+            if task["action"] == "execute_script":
+                self.execute_script(task["script"])
+        print("Plan execution finished.")
