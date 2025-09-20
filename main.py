@@ -12,7 +12,7 @@ def main():
     agent = Agent()
 
     # 2. Define a user request
-    user_request = "Run the hello-world scripts for all supported languages and log the result."
+    user_request = "Create a file named 'plan_test.txt' in the root directory, write a friendly greeting into it, and then list the files in the current directory to confirm it was created."
 
     # 3. Run the agent
     agent.run(user_request)

@@ -39,15 +39,28 @@ class Executor:
 
     def run_plan(self, plan: list):
         """
-        Executes a plan from the Planner.
+        Executes a plan from the Planner by dispatching tasks based on their action type.
         """
         print("Executing plan...")
+        if not plan:
+            print("Plan is empty. Nothing to execute.")
+            return
+
         for task in plan:
             action = task.get("action")
+            params = task.get("params", {})
+
+            print(f"--- Executing action: {action} ---")
+
             if action == "execute_script":
-                self.execute_script(task.get("script"))
+                self.execute_script(params.get("script"))
             elif action == "execute_in_ubuntu":
-                ubuntu_manager.execute_in_ubuntu(task.get("command"))
+                ubuntu_manager.execute_in_ubuntu(params.get("command"))
+            elif "." in action:
+                # This is a placeholder for tool execution, e.g., "fs.write"
+                tool_name, tool_action = action.split('.', 1)
+                print(f"INFO: Would execute tool '{tool_name}' (action: {tool_action}) with params: {params}")
             else:
-                print(f"Unknown action type: {action}")
-        print("Plan execution finished.")
+                print(f"⚠️ Unknown action type: {action}")
+
+        print("--- Plan execution finished. ---")
