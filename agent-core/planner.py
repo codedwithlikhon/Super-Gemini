@@ -1,3 +1,5 @@
+import os
+
 class Planner:
     """
     Interprets user requests and breaks them down into executable tasks.
@@ -10,11 +12,13 @@ class Planner:
         print(f"Received user request: '{user_request}'")
         print("Creating a plan...")
 
-        # Dummy plan for now
-        plan = [
-            {"action": "execute_script", "script": "test_scripts/hello.sh"},
-            {"action": "execute_in_ubuntu", "command": "echo 'Hello from inside Ubuntu!'"},
-        ]
+        plan = []
+        if "hello-world" in user_request:
+            test_scripts_dir = "test_scripts"
+            scripts = os.listdir(test_scripts_dir)
+            for script in scripts:
+                if script.startswith("hello."):
+                    plan.append({"action": "execute_script", "script": os.path.join(test_scripts_dir, script)})
 
         print("Plan created successfully.")
         return plan
