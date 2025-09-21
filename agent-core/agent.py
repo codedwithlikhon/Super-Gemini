@@ -1,4 +1,14 @@
 import importlib
+import uuid
+from typing import Any, AsyncGenerator, Dict, List, Optional
+
+from .events import (
+    EventType, BaseEvent, RunStartedEvent, RunFinishedEvent,
+    RunErrorEvent, TextMessageStartEvent, TextMessageContentEvent,
+    TextMessageEndEvent, ToolCallStartEvent, ToolCallArgsEvent,
+    ToolCallEndEvent, StateSnapshotEvent
+)
+from .types import RunAgentInput, Message, Tool, Context
 
 # Dynamically import planner, executor, and memory_manager
 planner_module = importlib.import_module("agent-core.planner")
@@ -13,7 +23,8 @@ ubuntu_manager = ubuntu_manager_module
 
 class Agent:
     """
-    The central agent that orchestrates the planner, executor, and memory.
+    The central agent that orchestrates the planner, executor, and memory while
+    emitting AG-UI protocol events.
     """
     def __init__(self):
         self.planner = Planner()
@@ -28,21 +39,94 @@ class Agent:
 
         print("Agent initialized successfully.")
 
-    def run(self, user_request: str):
+    async def run_agent(self, input: RunAgentInput) -> AsyncGenerator[BaseEvent, None]:
         """
-        Runs the main agentic loop.
+        Runs the agent with the provided input, yielding AG-UI protocol events.
+        
+        Args:
+            input: The input parameters for running the agent
+            
+        Yields:
+            A stream of AG-UI protocol events
         """
-        print("\n🚀 Starting new agent run...")
+        try:
+            # Start the run
+            yield RunStartedEvent(
+                type=EventType.RUN_STARTED,
+                thread_id=input.thread_id,
+                run_id=input.run_id
+            )
 
-        preferences = self.memory.get_preferences()
-        print(f"Loaded preferences: {preferences}")
+            # Send initial state snapshot
+            yield StateSnapshotEvent(
+                type=EventType.STATE_SNAPSHOT,
+                snapshot=self.memory.get_preferences()
+            )
 
-        plan = self.planner.create_plan(user_request)
+            # Create message for text response
+            message_id = str(uuid.uuid4())
+            yield TextMessageStartEvent(
+                type=EventType.TEXT_MESSAGE_START,
+                message_id=message_id,
+                role="assistant"
+            )
 
-        self.executor.run_plan(plan)
+            # Create and execute plan
+            plan = await self.planner.create_plan(input)
 
-        print("\n📊 Run outcome: Success (dummy log)")
+            # Execute each step of the plan
+            for step in plan:
+                tool_call_id = str(uuid.uuid4())
 
-        self.memory.update_preferences({"last_run_status": "success", "last_task": user_request})
+                # Signal tool call start
+                yield ToolCallStartEvent(
+                    type=EventType.TOOL_CALL_START,
+                    tool_call_id=tool_call_id,
+                    tool_call_name=step.tool_name,
+                    parent_message_id=message_id
+                )
 
-        print("✅ Agent run finished.")
+                # Stream tool arguments
+                args_json = step.to_json()
+                yield ToolCallArgsEvent(
+                    type=EventType.TOOL_CALL_ARGS,
+                    tool_call_id=tool_call_id,
+                    delta=args_json
+                )
+
+                # Execute the step
+                result = await self.executor.execute_step(step)
+
+                # Signal tool call end
+                yield ToolCallEndEvent(
+                    type=EventType.TOOL_CALL_END,
+                    tool_call_id=tool_call_id
+                )
+
+                # Stream step result as text content
+                yield TextMessageContentEvent(
+                    type=EventType.TEXT_MESSAGE_CONTENT,
+                    message_id=message_id,
+                    delta=str(result)
+                )
+
+            # Signal message completion
+            yield TextMessageEndEvent(
+                type=EventType.TEXT_MESSAGE_END,
+                message_id=message_id
+            )
+
+            # Complete the run
+            yield RunFinishedEvent(
+                type=EventType.RUN_FINISHED,
+                thread_id=input.thread_id,
+                run_id=input.run_id,
+                result={"status": "success"}
+            )
+
+        except Exception as e:
+            # Handle any errors by emitting a run error event
+            yield RunErrorEvent(
+                type=EventType.RUN_ERROR,
+                message=str(e)
+            )
