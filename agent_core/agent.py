@@ -11,10 +11,10 @@ from .events import (
 from .types import RunAgentInput, Message, Tool, Context
 
 # Dynamically import planner, executor, and memory_manager
-planner_module = importlib.import_module("agent-core.planner")
-executor_module = importlib.import_module("agent-core.executor")
-memory_manager_module = importlib.import_module("agent-core.memory_manager")
-ubuntu_manager_module = importlib.import_module("agent-core.ubuntu_manager")
+planner_module = importlib.import_module("agent_core.planner")
+executor_module = importlib.import_module("agent_core.executor")
+memory_manager_module = importlib.import_module("agent_core.memory_manager")
+ubuntu_manager_module = importlib.import_module("agent_core.ubuntu_manager")
 
 Planner = planner_module.Planner
 Executor = executor_module.Executor
